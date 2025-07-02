@@ -231,4 +231,119 @@ footer {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* Vocabulary Section Styles */
+.vocabulary-section {
+    margin-top: 30px;
+}
+
+.search-container {
+    margin-bottom: 30px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--secondary-blue);
+}
+
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--border);
+    background-color: white;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-medium);
+}
+
+.filter-btn:hover {
+    border-color: var(--secondary-blue);
+    color: var(--secondary-blue);
+}
+
+.filter-btn.active {
+    background-color: var(--secondary-blue);
+    border-color: var(--secondary-blue);
+    color: white;
+}
+
+.vocabulary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fafafa;
+}
+
+.vocabulary-item {
+    background-color: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s ease;
+}
+
+.vocabulary-item:hover {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.vocabulary-id {
+    background-color: var(--light-blue);
+    color: var(--primary-blue);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    min-width: 35px;
+    text-align: center;
+}
+
+.vocabulary-label {
+    flex: 1;
+    margin-left: 12px;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+@media (max-width: 768px) {
+    .category-filters {
+        justify-content: center;
+    }
+    
+    .filter-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .vocabulary-grid {
+        grid-template-columns: 1fr;
+        max-height: 500px;
+    }
 } 
