@@ -6,12 +6,11 @@
     <title>TSL-ONE: Thai Sign Language Recognition Dataset</title>
     <meta name="description" content="TSL-ONE-S: A comprehensive Thai Sign Language dataset for recognition research, featuring 4,152 video samples across 184 glosses from 29 diverse signers.">
     <meta name="keywords" content="Thai Sign Language, TSL, sign language recognition, dataset, machine learning, computer vision">
-    
-    <!-- Simple visitor counter using GoatCounter (privacy-friendly) -->
+    <!-- Visitor counter using GoatCounter -->
     <script data-goatcounter="https://thaisignlanguageone.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
-    
-    <!-- External CSS file -->
+    <link rel="preconnect" href="https://thaisignlanguageone.goatcounter.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#1e3a8a">
 </head>
 <body>
     <header>
@@ -76,16 +75,19 @@
                 <div class="vocabulary-section">
                     <div class="search-container">
                         <input type="text" id="vocabularySearch" placeholder="Search vocabulary..." class="search-input">
+                        <p class="helper" id="searchHelp">Type a word or ID (e.g., 137)</p>
                         <div class="category-filters">
                             <button class="filter-btn active" data-category="all">All (184)</button>
                             <button class="filter-btn" data-category="countries">Countries (12)</button>
-                            <button class="filter-btn" data-category="landmarks">Landmarks (37)</button>
+                            <button class="filter-btn" data-category="landmarks">Special locations (37)</button>
                             <button class="filter-btn" data-category="numbers">Numbers (11)</button>
-                            <button class="filter-btn" data-category="alphabet">Thai Alphabet (49)</button>
-                            <button class="filter-btn" data-category="family">Family (37)</button>
+                            <button class="filter-btn" data-category="alphabet">Thai Alphabet and vowels (49)</button>
+                            <button class="filter-btn" data-category="family">Family & Relationships (37)</button>
+                            <button class="filter-btn" data-category="genders">Genders (8)</button>
                             <button class="filter-btn" data-category="sports">Sports (26)</button>
-                            <button class="filter-btn" data-category="food">Food (12)</button>
+                            <button class="filter-btn" data-category="groceries">Groceries (12)</button>
                         </div>
+                        <div class="results-meta"><span id="resultsCount" aria-live="polite"></span></div>
                     </div>
                     
                     <div class="vocabulary-grid" id="vocabularyGrid">
@@ -135,9 +137,13 @@
                         
                         <input type="hidden" name="_replyto" value="thaisignlanguage.one@gmail.com">
                         <input type="hidden" name="_subject" value="TSL-ONE Website Inquiry">
+                        <input type="text" name="website" id="hpField" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px" aria-hidden="true">
+                        <input type="hidden" id="formTimestamp" name="form_ts" value="">
+                        <input type="hidden" name="_next" value="./index.html#thank-you">
                         
                         <button type="submit" class="btn">Send Message</button>
                     </form>
+                    <div id="thank-you" class="highlight-box" hidden>Thank you! We received your message.</div>
                 </div>
             </section>
         </div>
@@ -153,136 +159,6 @@
         </div>
     </footer>
 
-    <script>
-        // Vocabulary data and functionality
-        let vocabularyData = {};
-        let filteredData = {};
-
-        // Category mappings based on ID ranges
-        const categoryMappings = {
-            countries: { start: 0, end: 11, name: "Countries" },
-            landmarks: { start: 12, end: 48, name: "Landmarks & Places" },
-            numbers: { start: 49, end: 59, name: "Numbers" },
-            alphabet: { start: 60, end: 108, name: "Thai Alphabet & Vowels" },
-            family: { start: 109, end: 145, name: "Family & Relationships" },
-            sports: { start: 146, end: 171, name: "Sports" },
-            food: { start: 172, end: 183, name: "Food" }
-        };
-
-        // Load vocabulary data
-        async function loadVocabulary() {
-            try {
-                const response = await fetch('tsl_one_s_id_to_label.json');
-                vocabularyData = await response.json();
-                filteredData = vocabularyData;
-                renderVocabulary();
-                setupEventListeners();
-            } catch (error) {
-                console.error('Error loading vocabulary:', error);
-                document.getElementById('vocabularyGrid').innerHTML = 
-                    '<p style="text-align: center; color: var(--text-medium);">Error loading vocabulary data.</p>';
-            }
-        }
-
-        // Get category for a given ID
-        function getCategory(id) {
-            const numId = parseInt(id);
-            for (const [category, range] of Object.entries(categoryMappings)) {
-                if (numId >= range.start && numId <= range.end) {
-                    return category;
-                }
-            }
-            return 'other';
-        }
-
-        // Render vocabulary items
-        function renderVocabulary() {
-            const grid = document.getElementById('vocabularyGrid');
-            const items = Object.entries(filteredData)
-                .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
-                .map(([id, label]) => `
-                    <div class="vocabulary-item" data-category="${getCategory(id)}" data-label="${label.toLowerCase()}">
-                        <span class="vocabulary-id">${id}</span>
-                        <span class="vocabulary-label">${label}</span>
-                    </div>
-                `).join('');
-            
-            grid.innerHTML = items || '<p style="text-align: center; color: var(--text-medium);">No items found.</p>';
-        }
-
-        // Filter by category
-        function filterByCategory(category) {
-            if (category === 'all') {
-                filteredData = vocabularyData;
-            } else {
-                const range = categoryMappings[category];
-                filteredData = {};
-                for (let i = range.start; i <= range.end; i++) {
-                    if (vocabularyData[i.toString()]) {
-                        filteredData[i.toString()] = vocabularyData[i.toString()];
-                    }
-                }
-            }
-            
-            // Apply current search term if any
-            const searchTerm = document.getElementById('vocabularySearch').value;
-            if (searchTerm) {
-                searchVocabulary(searchTerm);
-            } else {
-                renderVocabulary();
-            }
-        }
-
-        // Search vocabulary
-        function searchVocabulary(searchTerm) {
-            if (!searchTerm) {
-                renderVocabulary();
-                return;
-            }
-
-            const searchResults = {};
-            const term = searchTerm.toLowerCase();
-            
-            for (const [id, label] of Object.entries(filteredData)) {
-                if (label.toLowerCase().includes(term) || id === term) {
-                    searchResults[id] = label;
-                }
-            }
-            
-            const originalFiltered = filteredData;
-            filteredData = searchResults;
-            renderVocabulary();
-            filteredData = originalFiltered;
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Search input
-            const searchInput = document.getElementById('vocabularySearch');
-            searchInput.addEventListener('input', (e) => {
-                searchVocabulary(e.target.value);
-            });
-
-            // Category filter buttons
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    // Update active state
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    
-                    // Filter vocabulary
-                    const category = e.target.getAttribute('data-category');
-                    filterByCategory(category);
-                    
-                    // Clear search input
-                    searchInput.value = '';
-                });
-            });
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', loadVocabulary);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
